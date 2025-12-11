@@ -21,11 +21,12 @@ namespace BankApplication.Controllers
                 throw new ArgumentException("Invalid IP address format.", nameof(ip));
             }
             // Use platform-appropriate ping command
-            ProcessStartInfo processStartInfo = new ProcessStartInfo("ping", ip)
+            ProcessStartInfo processStartInfo = new ProcessStartInfo("ping")
             {
                 RedirectStandardOutput = true,
                 UseShellExecute = false
             };
+            processStartInfo.ArgumentList.Add(ip);
             Process? process = Process.Start(processStartInfo);
             process?.WaitForExit();
             return "value";
