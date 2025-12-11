@@ -15,10 +15,17 @@ namespace BankApplication.Controllers
         [HttpGet("{ip}")]
         public string Get(string ip)
         {
-            var cmd = "ping -c " + ip;
-            ProcessStartInfo processStartInfo = new ProcessStartInfo("cmd", "-c \"" + cmd + "\"");
-            processStartInfo.RedirectStandardOutput = true;
-            processStartInfo.UseShellExecute = false;
+            if (!System.Net.IPAddress.TryParse(ip, out _))
+            {
+                // Alternatively, allow specific hostnames by whitelisting, but here only IPs are allowed.
+                throw new ArgumentException("Invalid IP address format.", nameof(ip));
+            }
+            // Use platform-appropriate ping command
+            ProcessStartInfo processStartInfo = new ProcessStartInfo("ping", ip)
+            {
+                RedirectStandardOutput = true,
+                UseShellExecute = false
+            };
             Process? process = Process.Start(processStartInfo);
             process?.WaitForExit();
             return "value";
