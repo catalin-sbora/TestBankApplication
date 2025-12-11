@@ -685,8 +685,18 @@ $.extend( $.validator, {
 			} );
 		},
 
-		clean: function( selector ) {
-			return $( selector )[ 0 ];
+		// Ensures that only DOM elements are accepted; passing a string is unsafe.
+		clean: function( obj ) {
+			// If it's a DOM element, accept it.
+			if ( obj && (obj.nodeType === 1 || obj.nodeType === 9) ) {
+				return obj;
+			}
+			// If it's a jQuery object, return the first element.
+			if ( obj && obj instanceof $ && obj.length ) {
+				return obj[0];
+			}
+			// Otherwise, reject (do not pass strings to $()).
+			return null;
 		},
 
 		errors: function() {
@@ -1075,13 +1085,20 @@ $.extend( $.validator, {
 			return this.groups[ element.name ] || ( this.checkable( element ) ? element.name : element.id || element.name );
 		},
 
+		// Accepts only DOM elements; passing strings is dangerous - do NOT allow arbitrary selector or HTML strings.
 		validationTargetFor: function( element ) {
-
 			// If radio/checkbox, validate first element in group instead
 			if ( this.checkable( element ) ) {
 				element = this.findByName( element.name );
 			}
-
+			// Defensive: If element is a jQuery object, get the first DOM element.
+			if ( element && element instanceof $ && element.length ) {
+				element = element[0];
+			}
+			// If not a DOM element, abort (never pass arbitrary strings to $())
+			if ( !element || !(element.nodeType === 1 || element.nodeType === 9) ) {
+				return null;
+			}
 			// Always apply ignore filter
 			return $( element ).not( this.settings.ignore )[ 0 ];
 		},
