@@ -8,7 +8,7 @@ namespace BankApplication.Controllers
     {
         public IActionResult Index()
         {
-            return asasd View();
+            return  View();
         }
 
         public IActionResult Privacy()
